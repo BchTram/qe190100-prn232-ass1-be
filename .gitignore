@@ -1,0 +1,33 @@
+# Ignore build outputs
+**/bin/
+**/obj/
+.vs/
+
+# User specific
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Other
+*.DS_Store
+
+# NuGet
+*.nupkg
+
+# Logs
+logs/
+*.log
+
+# Documents
+*.docx
+
+# Local folders
+.venv/
+frontend/
