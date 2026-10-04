@@ -63,6 +63,14 @@ public class ProjectController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ProjectResponse>> Create([FromBody] ProjectCreateRequest request)
     {
+        _logger.LogInformation(
+            "Project create request received. ProjectName={ProjectName}, DepartmentId={DepartmentId}, StartDate={StartDate}, EndDate={EndDate}, Status={Status}",
+            request.ProjectName,
+            request.DepartmentId,
+            request.StartDate,
+            request.EndDate,
+            request.Status);
+
         try
         {
             var createdProject = await _projectService.CreateAsync(request);

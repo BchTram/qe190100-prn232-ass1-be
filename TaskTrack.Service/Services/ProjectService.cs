@@ -2,6 +2,7 @@ using TaskTrack.Repo.Interfaces;
 using TaskTrack.Repo.Models;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace TaskTrack.Service.Services;
 
@@ -9,13 +10,16 @@ public class ProjectService : IProjectService
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IDepartmentRepository _departmentRepository;
+    private readonly ILogger<ProjectService> _logger;
 
     public ProjectService(
         IProjectRepository projectRepository,
-        IDepartmentRepository departmentRepository)
+        IDepartmentRepository departmentRepository,
+        ILogger<ProjectService> logger)
     {
         _projectRepository = projectRepository;
         _departmentRepository = departmentRepository;
+        _logger = logger;
     }
 
     public async Task<IEnumerable<ProjectResponse>> GetAllAsync()
@@ -54,30 +58,55 @@ public class ProjectService : IProjectService
 
     public async Task<ProjectResponse> CreateAsync(ProjectCreateRequest request)
     {
-        if (request is null)
+        try
         {
-            throw new ArgumentNullException(nameof(request));
+            if (request is null)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
+            if (await _departmentRepository.GetByIdAsync(request.DepartmentId) is null)
+            {
+                throw new ArgumentException("Department does not exist.", nameof(request.DepartmentId));
+            }
+
+            var project = new Project
+            {
+                ProjectName = request.ProjectName.Trim(),
+                Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                Status = request.Status,
+                DepartmentId = request.DepartmentId,
+                IsActive = true,
+                CreatedDate = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified)
+            };
+
+            _logger.LogInformation(
+                "Mapped Project entity. ProjectName={ProjectName}, DepartmentId={DepartmentId}, StartDate={StartDate}, EndDate={EndDate}, Status={Status}, CreatedDate={CreatedDate}, CreatedDateKind={CreatedDateKind}",
+                project.ProjectName,
+                project.DepartmentId,
+                project.StartDate,
+                project.EndDate,
+                project.Status,
+                project.CreatedDate,
+                project.CreatedDate.Kind);
+
+            var createdProject = await _projectRepository.AddAsync(project);
+            return MapToResponse(createdProject);
         }
-
-        if (await _departmentRepository.GetByIdAsync(request.DepartmentId) is null)
+        catch (Exception ex)
         {
-            throw new ArgumentException("Department does not exist.", nameof(request.DepartmentId));
+            _logger.LogError(
+                ex,
+                "Project creation failed. ExceptionType={ExceptionType}, Message={Message}, InnerException={InnerException}, StackTrace={StackTrace}",
+                ex.GetType().FullName,
+                ex.Message,
+                ex.InnerException?.ToString(),
+                ex.StackTrace);
+
+            throw;
         }
-
-        var project = new Project
-        {
-            ProjectName = request.ProjectName.Trim(),
-            Description = string.IsNullOrWhiteSpace(request.Description) ? null : request.Description.Trim(),
-            StartDate = request.StartDate,
-            EndDate = request.EndDate,
-            Status = request.Status,
-            DepartmentId = request.DepartmentId,
-            IsActive = true,
-            CreatedDate = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc)
-        };
-
-        var createdProject = await _projectRepository.AddAsync(project);
-        return MapToResponse(createdProject);
     }
 
     public async Task<ProjectResponse?> UpdateAsync(int id, ProjectUpdateRequest request)
