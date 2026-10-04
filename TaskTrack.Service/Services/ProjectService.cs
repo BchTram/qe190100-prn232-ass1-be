@@ -73,7 +73,7 @@ public class ProjectService : IProjectService
             Status = request.Status,
             DepartmentId = request.DepartmentId,
             IsActive = true,
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc)
         };
 
         var createdProject = await _projectRepository.AddAsync(project);

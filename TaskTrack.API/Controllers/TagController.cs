@@ -106,7 +106,7 @@ public class TagController : ControllerBase
                 ex.InnerException?.ToString(),
                 ex.StackTrace);
 
-            return Conflict(ex.Message);
+            return Conflict(new { error = ex.Message });
         }
     }
 }

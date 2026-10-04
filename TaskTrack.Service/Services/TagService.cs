@@ -83,7 +83,8 @@ public class TagService : ITagService
         var isReferenced = await _tagRepository.IsTagReferencedByAnyTaskAsync(id);
         if (isReferenced)
         {
-            throw new InvalidOperationException("Cannot delete tag because it is currently referenced by one or more tasks.");
+            throw new InvalidOperationException(
+                "Tag cannot be deleted because it is being used.");
         }
 
         return await _tagRepository.DeleteAsync(id);

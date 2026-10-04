@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
+using Microsoft.Extensions.Logging;
+
 
 namespace TaskTrack.API.Controllers;
 
@@ -9,10 +11,12 @@ namespace TaskTrack.API.Controllers;
 public class ProjectController : ControllerBase
 {
     private readonly IProjectService _projectService;
+    private readonly ILogger<ProjectController> _logger;
 
-    public ProjectController(IProjectService projectService)
+    public ProjectController(IProjectService projectService, ILogger<ProjectController> logger)
     {
         _projectService = projectService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -107,6 +111,19 @@ public class ProjectController : ControllerBase
             }
 
             return NoContent();
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Delete Project {ProjectId} rejected. ExceptionType={ExceptionType}, Message={Message}, InnerException={InnerException}, StackTrace={StackTrace}",
+                id,
+                ex.GetType().FullName,
+                ex.Message,
+                ex.InnerException?.ToString(),
+                ex.StackTrace);
+
+            return Conflict(new { message = ex.Message });
         }
         catch (ArgumentOutOfRangeException ex)
         {

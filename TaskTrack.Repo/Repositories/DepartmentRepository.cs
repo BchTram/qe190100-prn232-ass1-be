@@ -73,7 +73,8 @@ public class DepartmentRepository : IDepartmentRepository
 
         if (await _context.Projects.AnyAsync(p => p.DepartmentId == id))
         {
-            throw new InvalidOperationException("Cannot delete a department that has projects.");
+            throw new InvalidOperationException(
+                "Department cannot be deleted because it contains projects.");
         }
 
         _context.Departments.Remove(department);
