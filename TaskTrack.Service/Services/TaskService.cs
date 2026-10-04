@@ -77,7 +77,7 @@ public class TaskService : ITaskService
             DueDate = request.DueDate,
             ProjectId = request.ProjectId,
             IsActive = true,
-            CreatedDate = DateTime.UtcNow,
+            CreatedDate = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified),
             ModifiedDate = null
         };
 

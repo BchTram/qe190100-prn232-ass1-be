@@ -8,10 +8,14 @@ namespace TaskTrack.Service.Services;
 public class ProjectService : IProjectService
 {
     private readonly IProjectRepository _projectRepository;
+    private readonly IDepartmentRepository _departmentRepository;
 
-    public ProjectService(IProjectRepository projectRepository)
+    public ProjectService(
+        IProjectRepository projectRepository,
+        IDepartmentRepository departmentRepository)
     {
         _projectRepository = projectRepository;
+        _departmentRepository = departmentRepository;
     }
 
     public async Task<IEnumerable<ProjectResponse>> GetAllAsync()
@@ -53,6 +57,11 @@ public class ProjectService : IProjectService
         if (request is null)
         {
             throw new ArgumentNullException(nameof(request));
+        }
+
+        if (await _departmentRepository.GetByIdAsync(request.DepartmentId) is null)
+        {
+            throw new ArgumentException("Department does not exist.", nameof(request.DepartmentId));
         }
 
         var project = new Project

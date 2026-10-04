@@ -5,20 +5,20 @@ namespace TaskTrack.Service.DTOs;
 public class TagCreateRequest
 {
     [Required]
-    [StringLength(100, MinimumLength = 1)]
+    [StringLength(50, MinimumLength = 1)]
     public string TagName { get; set; } = string.Empty;
 
-    [StringLength(20)]
+    [StringLength(7)]
     public string? Color { get; set; }
 }
 
 public class TagUpdateRequest
 {
     [Required]
-    [StringLength(100, MinimumLength = 1)]
+    [StringLength(50, MinimumLength = 1)]
     public string TagName { get; set; } = string.Empty;
 
-    [StringLength(20)]
+    [StringLength(7)]
     public string? Color { get; set; }
 }
 

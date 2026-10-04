@@ -106,7 +106,7 @@ public class TaskRepository : ITaskRepository
         }
 
         taskEntity.IsActive = false;
-        taskEntity.ModifiedDate = DateTime.UtcNow;
+        taskEntity.ModifiedDate = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
         await _context.SaveChangesAsync();
         return true;
     }

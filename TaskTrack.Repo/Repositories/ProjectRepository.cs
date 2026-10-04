@@ -84,6 +84,11 @@ public class ProjectRepository : IProjectRepository
             return false;
         }
 
+        if (await _context.Tasks.AnyAsync(t => t.ProjectId == id))
+        {
+            throw new InvalidOperationException("Cannot delete a project that has tasks.");
+        }
+
         _context.Projects.Remove(project);
         await _context.SaveChangesAsync();
         return true;

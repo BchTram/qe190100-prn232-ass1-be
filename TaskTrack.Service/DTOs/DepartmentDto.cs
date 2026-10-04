@@ -5,20 +5,20 @@ namespace TaskTrack.Service.DTOs;
 public class DepartmentCreateRequest
 {
     [Required]
-    [StringLength(200, MinimumLength = 1)]
+    [StringLength(100, MinimumLength = 1)]
     public string DepartmentName { get; set; } = string.Empty;
 
-    [StringLength(500)]
+    [StringLength(300)]
     public string? DepartmentDescription { get; set; }
 }
 
 public class DepartmentUpdateRequest
 {
     [Required]
-    [StringLength(200, MinimumLength = 1)]
+    [StringLength(100, MinimumLength = 1)]
     public string DepartmentName { get; set; } = string.Empty;
 
-    [StringLength(500)]
+    [StringLength(300)]
     public string? DepartmentDescription { get; set; }
 
     public bool IsActive { get; set; }
