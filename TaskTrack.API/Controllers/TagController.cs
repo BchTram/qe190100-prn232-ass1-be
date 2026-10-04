@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
+using Microsoft.Extensions.Logging;
+
 
 namespace TaskTrack.API.Controllers;
 
@@ -9,10 +11,12 @@ namespace TaskTrack.API.Controllers;
 public class TagController : ControllerBase
 {
     private readonly ITagService _tagService;
+    private readonly ILogger<TagController> _logger;
 
-    public TagController(ITagService tagService)
+    public TagController(ITagService tagService, ILogger<TagController> logger)
     {
         _tagService = tagService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -93,7 +97,16 @@ public class TagController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(ex.Message);
+            _logger.LogWarning(
+                ex,
+                "Delete Tag {TagId} rejected. ExceptionType={ExceptionType}, Message={Message}, InnerException={InnerException}, StackTrace={StackTrace}",
+                id,
+                ex.GetType().FullName,
+                ex.Message,
+                ex.InnerException?.ToString(),
+                ex.StackTrace);
+
+            return Conflict(ex.Message);
         }
     }
 }

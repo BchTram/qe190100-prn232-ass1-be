@@ -115,7 +115,7 @@ public class TaskService : ITaskService
         existingTask.Priority = request.Priority;
         existingTask.DueDate = request.DueDate;
         existingTask.ProjectId = request.ProjectId;
-        existingTask.ModifiedDate = DateTime.UtcNow;
+        existingTask.ModifiedDate = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified);
         existingTask.IsActive = request.IsActive;
 
         var updatedTask = await _taskRepository.UpdateAsync(existingTask);

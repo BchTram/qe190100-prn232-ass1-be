@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
 
 namespace TaskTrack.Repo.Models;
 
 public partial class Prn232PostgresContext : DbContext
 {
+    private readonly ILogger<Prn232PostgresContext>? _logger;
+
     public Prn232PostgresContext()
     {
     }
@@ -13,6 +17,14 @@ public partial class Prn232PostgresContext : DbContext
     public Prn232PostgresContext(DbContextOptions<Prn232PostgresContext> options)
         : base(options)
     {
+    }
+
+    public Prn232PostgresContext(
+        DbContextOptions<Prn232PostgresContext> options,
+        ILogger<Prn232PostgresContext> logger)
+        : base(options)
+    {
+        _logger = logger;
     }
 
     public virtual DbSet<Department> Departments { get; set; }
@@ -114,6 +126,37 @@ public partial class Prn232PostgresContext : DbContext
         });
 
         OnModelCreatingPartial(modelBuilder);
+    }
+
+    public override async Task<int> SaveChangesAsync(
+        bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            return await base.SaveChangesAsync(
+                acceptAllChangesOnSuccess,
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            var pendingChanges = string.Join(
+                ", ",
+                ChangeTracker.Entries()
+                    .Where(entry => entry.State != EntityState.Unchanged)
+                    .Select(entry => $"{entry.Metadata.ClrType.Name}:{entry.State}"));
+
+            _logger?.LogError(
+                ex,
+                "SaveChangesAsync failed. ExceptionType={ExceptionType}, Message={Message}, InnerException={InnerException}, StackTrace={StackTrace}, PendingChanges={PendingChanges}",
+                ex.GetType().FullName,
+                ex.Message,
+                ex.InnerException?.ToString(),
+                ex.StackTrace,
+                pendingChanges);
+
+            throw;
+        }
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

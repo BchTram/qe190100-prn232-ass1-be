@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace TaskTrack.API.Controllers;
 
@@ -9,10 +10,14 @@ namespace TaskTrack.API.Controllers;
 public class DepartmentController : ControllerBase
 {
     private readonly IDepartmentService _departmentService;
+    private readonly ILogger<DepartmentController> _logger;
 
-    public DepartmentController(IDepartmentService departmentService)
+    public DepartmentController(
+        IDepartmentService departmentService,
+        ILogger<DepartmentController> logger)
     {
         _departmentService = departmentService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -99,6 +104,19 @@ public class DepartmentController : ControllerBase
         catch (ArgumentOutOfRangeException ex)
         {
             return BadRequest(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Delete Department {DepartmentId} rejected. ExceptionType={ExceptionType}, Message={Message}, InnerException={InnerException}, StackTrace={StackTrace}",
+                id,
+                ex.GetType().FullName,
+                ex.Message,
+                ex.InnerException?.ToString(),
+                ex.StackTrace);
+
+            return Conflict(ex.Message);
         }
     }
 }
