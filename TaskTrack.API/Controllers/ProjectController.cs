@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -61,6 +62,7 @@ public class ProjectController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<ActionResult<ProjectResponse>> Create([FromBody] ProjectCreateRequest request)
     {
         _logger.LogInformation(
@@ -87,6 +89,7 @@ public class ProjectController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<ActionResult<ProjectResponse>> Update(int id, [FromBody] ProjectUpdateRequest request)
     {
         try
@@ -107,6 +110,7 @@ public class ProjectController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<IActionResult> Delete(int id)
     {
         try

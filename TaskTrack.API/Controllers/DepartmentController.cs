@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -48,6 +49,7 @@ public class DepartmentController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<ActionResult<DepartmentResponse>> Create([FromBody] DepartmentCreateRequest request)
     {
         try
@@ -66,6 +68,7 @@ public class DepartmentController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<ActionResult<DepartmentResponse>> Update(
         int id,
         [FromBody] DepartmentUpdateRequest request)
@@ -88,6 +91,7 @@ public class DepartmentController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<IActionResult> Delete(int id)
     {
         try

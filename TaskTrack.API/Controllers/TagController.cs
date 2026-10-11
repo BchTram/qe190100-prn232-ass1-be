@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -40,6 +41,7 @@ public class TagController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<ActionResult<TagResponse>> Create([FromBody] TagCreateRequest request)
     {
         try
@@ -58,6 +60,7 @@ public class TagController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<ActionResult<TagResponse>> Update(int id, [FromBody] TagUpdateRequest request)
     {
         try
@@ -78,6 +81,7 @@ public class TagController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<IActionResult> Delete(int id)
     {
         try

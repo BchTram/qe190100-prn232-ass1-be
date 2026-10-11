@@ -9,7 +9,7 @@ public interface ITaskService
     Task<TaskResponse?> GetByIdAsync(int id);
     Task<IEnumerable<TaskResponse>> GetByProjectIdAsync(int projectId);
     Task<IEnumerable<TaskResponse>> SearchAsync(string? keyword, short? status, short? priority, int? projectId);
-    Task<TaskResponse> CreateAsync(TaskCreateRequest request);
+    Task<TaskResponse> CreateAsync(TaskCreateRequest request, int creatorAccountId);
     Task<TaskResponse?> UpdateAsync(int id, TaskUpdateRequest request);
     Task<bool> DeleteAsync(int id);
 }

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using TaskTrack.Service.DTOs;
 using TaskTrack.Service.Interfaces;
 
@@ -67,11 +69,17 @@ public class TaskController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<ActionResult<TaskResponse>> Create([FromBody] TaskCreateRequest request)
     {
         try
         {
-            var createdTask = await _taskService.CreateAsync(request);
+            if (!int.TryParse(User.FindFirstValue("AccountID"), out var creatorAccountId))
+            {
+                return Unauthorized();
+            }
+
+            var createdTask = await _taskService.CreateAsync(request, creatorAccountId);
             return CreatedAtAction(nameof(GetById), new { id = createdTask.TaskId }, createdTask);
         }
         catch (ArgumentException ex)
@@ -85,6 +93,7 @@ public class TaskController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<ActionResult<TaskResponse>> Update(int id, [FromBody] TaskUpdateRequest request)
     {
         try
@@ -108,6 +117,7 @@ public class TaskController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = "AuthenticatedUser")]
     public async Task<IActionResult> Delete(int id)
     {
         try

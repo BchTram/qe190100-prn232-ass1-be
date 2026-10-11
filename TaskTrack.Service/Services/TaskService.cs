@@ -55,7 +55,7 @@ public class TaskService : ITaskService
         return tasks.Select(MapToResponse);
     }
 
-    public async Task<TaskResponse> CreateAsync(TaskCreateRequest request)
+    public async Task<TaskResponse> CreateAsync(TaskCreateRequest request, int creatorAccountId)
     {
         if (request is null)
         {
@@ -78,7 +78,8 @@ public class TaskService : ITaskService
             ProjectId = request.ProjectId,
             IsActive = true,
             CreatedDate = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Unspecified),
-            ModifiedDate = null
+            ModifiedDate = null,
+            CreatedByAccountId = creatorAccountId
         };
 
         var createdTask = await _taskRepository.AddAsync(task);
