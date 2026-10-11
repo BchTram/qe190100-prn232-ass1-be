@@ -119,6 +119,12 @@ builder.Services.AddHostedService<AdminSeederHostedService>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<Prn232PostgresContext>();
+    dbContext.Database.Migrate();
+}
+
 // Swagger
 app.UseSwagger();
 
